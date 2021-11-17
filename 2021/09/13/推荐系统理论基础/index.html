@@ -6,24 +6,29 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://aj-web.github.io">
-  <title>对象内存机制分配 | 呢喃的博客</title>
+  <title>推荐系统理论基础 | 呢喃的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解">
+  <meta name="description" content="相信大家都在网上买过东西，那么各种各样的商城都会有类似猜你喜欢的推荐，不知道大家觉得这些推荐准嘛？可能准确率会因人而异，但是可以确定是，这种推荐系统对于提高销售额，一定是有帮助的，今天就来了解一下推荐系统">
 <meta property="og:type" content="article">
-<meta property="og:title" content="对象内存机制分配">
-<meta property="og:url" content="https://aj-web.github.io/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/index.html">
+<meta property="og:title" content="推荐系统理论基础">
+<meta property="og:url" content="https://aj-web.github.io/2021/09/13/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="呢喃的博客">
-<meta property="og:description" content="前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解">
+<meta property="og:description" content="相信大家都在网上买过东西，那么各种各样的商城都会有类似猜你喜欢的推荐，不知道大家觉得这些推荐准嘛？可能准确率会因人而异，但是可以确定是，这种推荐系统对于提高销售额，一定是有帮助的，今天就来了解一下推荐系统">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/TLAB.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%A4%B4.png">
-<meta property="article:published_time" content="2021-08-26T01:54:41.570Z">
-<meta property="article:modified_time" content="2021-08-26T01:54:41.570Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%AE%9A%E4%B9%89%E5%9B%BE.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E7%94%A8%E6%88%B7%E5%95%86%E5%93%81%E5%90%91%E9%87%8F%E7%9F%A9%E9%98%B5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%95%86%E5%93%81%E5%88%A9%E6%B6%A6%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E8%A5%BF%E7%93%9C%E4%B9%A6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E8%8A%B1%E4%B9%A6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%80%BB%E7%BB%93.png">
+<meta property="article:published_time" content="2021-09-13T10:38:30.031Z">
+<meta property="article:modified_time" content="2021-09-13T10:38:30.031Z">
 <meta property="article:author" content="ninan">
-<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="机器学习、推荐系统">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%AE%9A%E4%B9%89%E5%9B%BE.png">
   
     <link rel="alternative" href="/atom.xml" title="呢喃的博客" type="application/atom+xml">
   
@@ -159,20 +164,20 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-JVM对象内存机制分配" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-推荐系统理论基础" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      对象内存机制分配
+      推荐系统理论基础
     </h1>
   
 
         
-        <a href="/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/" class="archive-article-date">
-  	<time datetime="2021-08-26T01:54:41.570Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-26</time>
+        <a href="/2021/09/13/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="archive-article-date">
+  	<time datetime="2021-09-13T10:38:30.031Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-13</time>
 </a>
         
       </header>
@@ -181,58 +186,58 @@
       
         <hr>
 <blockquote>
-<p>前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解    </p>
+<p>相信大家都在网上买过东西，那么各种各样的商城都会有类似猜你喜欢的推荐，不知道大家觉得这些推荐准嘛？可能准确率会因人而异，但是可以确定是，这种推荐系统对于提高销售额，一定是有帮助的，今天就来了解一下推荐系统</p>
 </blockquote>
 <span id="more"></span>
 
-<h1 id="1-对象的创建总流程"><a href="#1-对象的创建总流程" class="headerlink" title="1. 对象的创建总流程"></a>1. 对象的创建总流程</h1><p>直接上我整理的图，按照这个图的顺序来讲解对象创建的流程<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png" alt="对象创建"></p>
-<h4 id="1-1-类加载检查"><a href="#1-1-类加载检查" class="headerlink" title="1.1 类加载检查"></a>1.1 类加载检查</h4><p>虚拟机遇到一条new指令时，首先将去检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。<br>new指令对应到语言层面上讲是，new关键词、对象克隆、对象序列化等。</p>
-<h4 id="1-2-分配内存"><a href="#1-2-分配内存" class="headerlink" title="1.2 分配内存"></a>1.2 分配内存</h4><p>(1)指针碰撞”（Bump the Pointer）：如果内存规整那么指针左边存放已经分配的内存，右边存放未分配的内粗你，指针移动一段等于对象大小的距离<br>(2)空闲列表”（Free List）：如果内存不规整，就需要有一个列表记录哪些内存可用,为什么会出现空闲列表的情况，垃圾回收中的标记清除<br>(3)多线程中，多个对象分配内存，如何确保每个对象都成功分配内存：<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/TLAB.png" alt="TLAB"><br>3.1:CAS（compare and swap）虚拟机采用CAS配上失败重试的方式保证更新操作的原子性来对分配内存空间的动作进行同步处理。<br>3.2:本地线程分配缓冲（Thread Local Allocation Buffer,TLAB），把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存。通过­XX:+/­-UseTLAB参数来设定虚拟机是否使用TLAB(JVM会默认开启­XX:+UseTLAB)，­XX:TLABSize 指定TLAB大小，默认大小为Eden的1%  </p>
-<h4 id="1-3-初始化零值"><a href="#1-3-初始化零值" class="headerlink" title="1.3 初始化零值"></a>1.3 初始化零值</h4><p>内存分配完成后，虚拟机需要将分配到的内存空间都初始化为零值（不包括对象头）， 如果使用TLAB，这一工作过程也可以提前至TLAB分配时进行。这一步操作保证了对象的实例字段在Java代码中可以不赋初始值就直接使用，程序能访问到这些字段的数据类型    所对应的零值。</p>
-<h4 id="1-4-设置对象头"><a href="#1-4-设置对象头" class="headerlink" title="1.4 设置对象头"></a>1.4 设置对象头</h4><p>对象在内存中存储的布局可以分为3块区域：对象头（Header）、 实例数据（Instance Data）和对齐填充（Padding），对象头详细如下<br>Mark Word：不同状态的对线头不一样，一般有对象的hashcode(25位)，分代年龄(4位),是否偏向头，锁标志位<br>Klass Points：开启指针压缩时占4个字节，关闭指针压缩时占8个字节<br>数组长度：当对象为数组的时候才有<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%A4%B4.png" alt="对象头"></p>
-<h4 id="1-5-执行init方法"><a href="#1-5-执行init方法" class="headerlink" title="1.5 执行init方法"></a>1.5 执行init方法</h4><p>init方法是C++语言实现的，执行<init>方法，即对象按照程序员的意愿进行初始化。对应到语言层面上讲，<br>就是为属性赋值（注意，这与上面的赋零值不同，这是由程序员赋的值），和执行构造方法。   </p>
-<h4 id="1-6-什么是指针压缩"><a href="#1-6-什么是指针压缩" class="headerlink" title="1.6 什么是指针压缩"></a>1.6 什么是指针压缩</h4><p>java对象的指针压缩？<br>1.在64位平台的HotSpot中使用32位指针(实际存储用64位)，内存使用会多出1.5倍左右，使用较大指针在主内存和缓存之间移动数据，占用较大宽带，同时GC也会承受较大压力<br>2.为了减少64位平台下内存的消耗，启用指针压缩功能<br>3.在jvm中，32位地址最大支持4G内存(2的32次方)，可以通过对对象指针的存入堆内存时压缩编码、取出到cpu寄存器后解码方式进行优化(对象指针在堆中是32位，在寄存器中是35位，2的35次方=32G)，使得jvm只用32位地址就可以支持更大的内存配置(小于等于32G)<br>4.堆内存小于4G时，不需要启用指针压缩，jvm会直接去除高32位地址，即使用低虚拟地址空间<br>5.堆内存大于32G时，压缩指针会失效，会强制使用64位(即8字节)来对java对象寻址，这就会出现1的问题，所以堆内存不要大于32G为好</p>
-<h4 id="1-7-对齐填充："><a href="#1-7-对齐填充：" class="headerlink" title="1.7 对齐填充："></a>1.7 对齐填充：</h4><p>对于大部分处理器，对象以8字节整数倍来对齐填充都是最高效的存取方式</p>
-<h1 id="2-对象内存分配"><a href="#2-对象内存分配" class="headerlink" title="2. 对象内存分配"></a>2. 对象内存分配</h1><p>上面我们讲了对象分配的方式，接着我们来介绍下对象具体如何分配的   </p>
-<h4 id="2-1"><a href="#2-1" class="headerlink" title="2.1"></a>2.1</h4><ol>
-<li>new一个对象时，会通过逃逸分析先判断对象能否分配在栈上，JVM通过逃逸分析确定该对象不会被外部访问。如果不会逃逸可以将该对象在栈上分配内存，这样可以减轻垃圾回收的压力<br>在栈上创建对象的时候，还会通过标量替换，来优化  </li>
+<h1 id="1-推荐系统功能介绍"><a href="#1-推荐系统功能介绍" class="headerlink" title="1. 推荐系统功能介绍"></a>1. 推荐系统功能介绍</h1><h2 id="1-1-推荐系统"><a href="#1-1-推荐系统" class="headerlink" title="1.1 推荐系统"></a>1.1 推荐系统</h2><p>&emsp;&emsp;推荐系统是利用电子商务网站向客户提供商品信息和建议，帮助用户决定应该购买什么产品，模拟销售人员帮助客户完成购买过程。个性化推荐是根据用户的兴趣特点和购买行为，向用户推荐用户感兴趣的信息和商品</p>
+<h2 id="1-2-定义"><a href="#1-2-定义" class="headerlink" title="1.2 定义"></a>1.2 定义</h2><p>&emsp;&emsp;推荐系统有3个重要的模块：用户建模模块、推荐对象建模模块、推荐算法模块。通用的推荐系统模型流程如图。推荐系统把用户模型中兴趣需求信息和推荐对象模型中的特征信息匹配，同时使用相应的推荐算法进行计算筛选，找到用户可能感兴趣的推荐对象，然后推荐给用户。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%AE%9A%E4%B9%89%E5%9B%BE.png" alt="推荐系统"></p>
+<h1 id="2-推荐系统实现"><a href="#2-推荐系统实现" class="headerlink" title="2. 推荐系统实现"></a>2. 推荐系统实现</h1><h2 id="2-1-简单推荐系统思路？"><a href="#2-1-简单推荐系统思路？" class="headerlink" title="2.1 简单推荐系统思路？"></a>2.1 简单推荐系统思路？</h2><p>例如：<br>1.把每天打折的物品进行推荐？<br>2.在订单表中找销售量最靠前的产品？<br>&emsp;&emsp;上述也是比较简单的实现思路，但是并不智能，不能根据每个人的喜好来推荐，各大主流的购物网也明显不是采用这种方式来实现</p>
+<p>&emsp;&emsp;所以要选择合适的推荐系统，我们需要了解推荐系统的作用：<br>&emsp;&emsp;推荐系统要能够根据用户的信息需求，兴趣爱好等，将用户感兴趣的信息、产品等推荐给用户的个性化信息推荐系统。<br>&emsp;&emsp;站在电商网站的角度，只是从销量或者打折这样单方面进行推荐，这样的推荐系统肯定是起不到吸引客户消费的目的。所以，好的推荐系统必须考虑到用户的喜好以及产品的特点。用户经常浏览以及购买什么物品，购买产品最多的人是年轻人还是老年人？那电商网站怎么知道用户的喜好，以及产品的受众呢？这就必须要基于大量用户和产品的数据，所以本次的推荐系统就是来带大家一起处理，收集，计算这些大量的用户以及产品的数据，通过机器学习的方式，形成一个有价值的推荐系统</p>
+<h2 id="2-2-推荐系统核心理解"><a href="#2-2-推荐系统核心理解" class="headerlink" title="2.2 推荐系统核心理解"></a>2.2 推荐系统核心理解</h2><p>&emsp;&emsp;推荐系统在我们实际生活中，可以有很多衍生场景。那这些推荐系统的核心到底是什么呢？其实推荐系统的真正核心可以理解为一个矩阵求解的数学问题。<br>&emsp;&emsp;比如，网站向用户推荐商品，往往要基于用户以以往的浏览记录或者评价记录，而这些记录就可以抽象为（userid，productid，score）这样的一个向量结构，score可以是一个任意的数字，比如在这里表示用户的浏览次数，也可以是一个0或1的值，表示用户与商品之间是否建立了关系，比如是否购买过商品。而这样一些数据往往是比较零散的。当我们需要将这些数据整体进行梳理，就会以userid为一列，productid为一行，整理成这样一个矩阵。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E7%94%A8%E6%88%B7%E5%95%86%E5%93%81%E5%90%91%E9%87%8F%E7%9F%A9%E9%98%B5.png" alt="用户商品向量矩阵"></p>
+<p>&emsp;&emsp;一个向量数据,就代表了矩阵中的一个点，在这个矩阵中，数据通常是比较稀疏的，称为稀疏矩阵，而推荐算法要做的，就是将这些矩阵中的空白点，以某一种方法进行部分填充或者全部填充，每填充一个点，就代表向用户推荐这个产品的一个推荐指数，然后选举推荐指数比较高的产品推荐给客户。</p>
+<h2 id="2-3-推荐系统效果评价"><a href="#2-3-推荐系统效果评价" class="headerlink" title="2.3 推荐系统效果评价"></a>2.3 推荐系统效果评价</h2><p>&emsp;&emsp;针对上面想法，当我们有了数据之后，我们就可以把推荐系统这个抽象的理论问题，转换成一个具体的数学问题，但是这个问题并没有标准的答案，我们可以往里面填写任意的数字，即使当我们运用机器学习来预测，不同的模型，算法，也会预测出不同的结果，但是在众多的结果之中，总会有一些结果会更加适合大众的口味，虽然不同的推荐系统没有明确的分数来表示他的好坏，但是，最重他们还是会体现出不同层次的好坏。<br>&emsp;&emsp;那么为什么会这样呢？从数学的角度来看待这个问题，就是因为我们自己设计的推荐系统没有很好的利用已有的数据，没有从已有数据中”学习”到内在的规律。而好的推荐系统则是通过机器学习很好的挖掘出了已有数据的一些内在规律，这些内在规律可以体现为每个用户的兴趣爱好，每个产品的最佳受众等等很多规律，甚至于很多人类无法描述的规律。<br>&emsp;&emsp;比如最经典的啤酒和尿不湿要放在一起售卖的问题，这是一个机器学习中的经典故事，你可以强行做一些解释，但是总是很难接触到本质。所欲，对于推荐系统的评价需要基于非常多的维度进行综合评价。大致可以分为以下几类：</p>
+<ul>
+<li><p>基于常识的评判标准<br>&emsp;&emsp;从上面我们已经知道了，推荐系统其实只是一个数字游戏，但是我们的业务不可能是简单的数字游戏。有一些推荐的结果，我们是可以直接从业务上判断是好是坏的，其中坏的推荐的比例，就可以作为对推荐系统一个评判的标准。</p>
+<p>&emsp;&emsp;比如，对于天猫，淘宝这类电商网站，给用户推荐他已经购买过的商品，往往就不是一个比较好的结果。但是推荐已经购买过的商品的周边商品，这个结果就比较好。就比如用户购买了一个鼠标，用户再去购买鼠标的概率就比较低，但是如果推荐一个配套的鼠标垫，鼠标贴，用户去购买的可能性就会比较高。<br>&emsp;&emsp;对于一个音乐类的内容推荐系统，如果用户是某一个歌星的粉丝，那么再去给他推荐这个歌星的其他的歌或者专辑，意义就不是那么大，因为这些内容用户通常都会主动搜索。再比如对一个新闻类的内容推荐系统，如果推荐给用户的新闻包含了很多”过时”的内容，或者推荐很久之前的帖子，那么显然也不是一个好的推荐</p>
+</li>
+<li><p>基于指标的评判标准<br>&emsp;&emsp;通常对于业务系统的评价，还是会回归到业务的本身。所以对于推荐系统最常见的评判标准，还是通过一定的业务指标来衡量。例如常见的PV、UV、用户留存率、转化率等等，通过比对上推荐系统之前和之后的指标数据，来衡量一个推荐系统是不是有效，或者拿推荐系统优化前后的数据进行比较，来看推荐系统的优化是否有效。比如对于猫眼这样的购票系统，最直接的衡量标准就是推荐系统带来的流量和收入的增长<br>&emsp;&emsp;另外，对于推荐系统，还有⼀个⾮常重要的指标就是推荐产品的覆盖率，也就是推荐出来的产品应该要越丰富越  好。这是为什么呢？这就涉及到了电商的⼀个根本性的理论模型-“⻓尾经济模型”。商品的交易⾏为，通常都会遵循<br>⼀个普遍性的2-8理论，即80%的利润出⾃于20%的商品。⽐如我们去超市购物，通常也都⽐较喜欢购买最热⻔的， 品牌印象⼒⼤的商品。所以当我们以产品为X轴，产品带来的利润为Y轴，经过整理通常都能得到⼀个这样的正态分布图<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%95%86%E5%93%81%E5%88%A9%E6%B6%A6%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83.png" alt="商品利润正态分布图">   </p>
+</li>
+<li><p>基于机器学习的评判标准<br>&emsp;&emsp;通常推荐系统需要结合⼤量的业务数据，通过对历史数据的挖掘、分析，归纳出⽤⼾与产品之间的⼀些关系。这些  关系通常过于隐晦，有些是能够进⾏解释的特征，⽐如⽤⼾的爱好、产品的受众特点等。但是往往还有很多隐藏的关系是⽆法⽤简单的常理来解释的。这些关系就要通过机器学习的算法来进⾏深⼊挖掘。最终通过这些分析，所以现在业界普遍的推荐系统都是基于机器学习算法来完成的。⽽每⼀个机器学习的算法，都会有他⾃⼰的评判指标和优化⽅式</p>
+</li>
+</ul>
+<h1 id="3-推荐系统-机器学习基础"><a href="#3-推荐系统-机器学习基础" class="headerlink" title="3 推荐系统-机器学习基础"></a>3 推荐系统-机器学习基础</h1><h2 id="3-1-机器学习的起源："><a href="#3-1-机器学习的起源：" class="headerlink" title="3.1 机器学习的起源："></a>3.1 机器学习的起源：</h2><ul>
+<li><strong>机器学习的5个学派：</strong>  </li>
+</ul>
+<ol>
+<li><p>符号主义(Symbolism)，也称为逻辑主义，强调认知即计算，通过对符号的演绎和逆演绎进行结果预测，最喜欢的算法是：规则和决策树。  </p>
+</li>
+<li><p>连接主义(Connectionists)，强调的是从仿⽣学的⻆度，对大脑进行仿真，使用概率矩阵和加权神经元来动态地识别和归纳模式，最喜欢的算法是：深度学习<br>。  </p>
+</li>
+<li><p>⾏为主义(Analogizer)，强调新旧知识间的相似性 ，代表算法:核机器（Kernel machines）、近邻算法（Nearest Neightor）</p>
+</li>
+<li><p>贝叶斯派(Bayesians)：获取发生的可能性来进行概率推理，强调主观概率估计，发生概率修正，最优决策，最喜欢的算法是：朴素贝叶斯或马尔可夫</p>
+</li>
+<li><p>进化主义(Evolutionaries):强调对进化进行模拟，使用遗传算法和遗传编程</p>
+</li>
 </ol>
 <ul>
-<li>对象逃逸分析：就是分析对象动态作用域，当一个对象在方法中被定义后，它可能被外部方法所引用，例如作为调用参数传递到其他地方中。说白了就是判断这个对象是否只在一个方法中被使用</li>
-<li>标量替换：通过逃逸分析确定该对象不会被外部访问，并且对象可以被进一步分解时，JVM不会创建该对象，而是将该对象成员变量分解若干个被这个方法使用的成员变量所代替，这些代替的成员变量在栈帧或寄存器上分配空间，这样就不会因为没有一大块连续空间导致对象内存不够分配</li>
-<li>标量与聚合量：标量即不可被进一步分解的量，而JAVA的基本数据类型就是标量（如：int，long等基本数据类型以及reference类型等），标量的对立就是可以被进一步分解的量，而这种量称之为聚合量。而在JAVA中对象就是可以被进一步分解的聚合量。结论：栈上分配依赖于逃逸分析和标量替换   </li>
+<li><strong>机器学习的应⽤领域是⾮常多的，⼤体上，可以分为三个主要的⽅向：</strong></li>
 </ul>
-<ol start="2">
-<li>能在栈上分配，则在栈上分配，否则在堆上进行分配   </li>
-<li>在堆上进行分配时：对象优先分配在Eden区,如果是大对象(字符串，数组)，大对象大小在这个参数只在 Serial 和ParNew两个收集器下可以设置，会直接放进老年代   </li>
-<li>不是大对象，会判断Eden区能否放下，不能的话，会执行minor GC，执行完还不能就会直接放入老年代   </li>
-<li>不是大对象则会采用TLAB在堆中预先分配内存，或者直接分配，多线程可能CAS分配 </li>
-</ol>
-<h4 id="2-2-对象动态年龄判断"><a href="#2-2-对象动态年龄判断" class="headerlink" title="2.2 对象动态年龄判断"></a>2.2 对象动态年龄判断</h4><p>对象动态年龄判断机制一般是在minor gc之后触发的。当前存放对象的Survivor区中，一批对象的总大小大于Survivor区域内存大小的50%(-XX:TargetSurvivorRatio可以指定年龄最大值)，那么此时大于等于这批对象年龄最大值的对象，就可以直接进入老年代了。这个规则其实是希望那些可能是长期存活的对象，尽早进入老年代。</p>
-<h4 id="2-3-老年代空间分配担保机制"><a href="#2-3-老年代空间分配担保机制" class="headerlink" title="2.3 老年代空间分配担保机制"></a>2.3 老年代空间分配担保机制</h4><p>年轻代每次minor GC之前都会判断如果老年代的可用空间小于年轻代里面所有对象的大小之和，就会看一个-XX:-HandlePromotionFailure”(jdk1.8默认就设置了)是否设置，如果有就会看历史minor GC之后进入老年代对象的平均大小是否小于老年代的可用内存，如果小于，代表执行minor GC即可，如果大于则执行full GC，没有设置参数则直接执行full GC，如果经过以上操作，对象不能全放进老年带，则OOM错误</p>
-<h1 id="3-对象内存回收"><a href="#3-对象内存回收" class="headerlink" title="3. 对象内存回收"></a>3. 对象内存回收</h1><h4 id="3-1-引用计数法"><a href="#3-1-引用计数法" class="headerlink" title="3.1 引用计数法"></a>3.1 引用计数法</h4><p>给对象中添加一个引用计数器，每当有一个地方引用它，计数器就加1；当引用失效，计数器就减1；任何时候计数器为0的对象就是不可能再被使用的。解决不了对象相互循环引用的问题</p>
-<h4 id="3-2-可达性算法"><a href="#3-2-可达性算法" class="headerlink" title="3.2 可达性算法"></a>3.2 可达性算法</h4><p>将“GC Roots” 对象作为起点，从这些节点开始向下搜索引用的对象，找到的对象都标记为非垃圾对象，其余未标记的对象都是垃圾对象，<br>GC Roots根节点：线程栈的本地变量、静态变量、本地方法栈的变量等等</p>
 <ol>
-<li>虚拟机栈（栈帧中的本地变量表）中引用的对象</li>
-<li>本地方法栈中JNI（即一般说的Native方法）引用的对象</li>
-<li>方法区中类静态属性引用的对象</li>
-<li>方法区中常量引用的对象</li>
+<li>传统预测：主要⽤在数据挖掘，预测领域。典型的应⽤场景： 店铺销量预测、房价预测、垃圾邮件安全监测等。包括我们这个课程的推荐系统，其实⼤体上也可以分到这⼀类。当然，这也并不是绝对的。基于神经⽹络 的推荐系统也是有很多落地实现的</li>
+<li>图像识别：典型应⽤场景：⾃动驾驶、⼈脸识别、涉⻩图⽚视频过滤等</li>
+<li>⾃然语⾔处理：典型应⽤场景：⽂本分类、聊天机器⼈、智能客服、⽂本翻译等。其实我们能感觉到，早期的  百度中英⽂翻译就⾮常难懂，语法⾮常混乱。但是现在百度中英⽂翻译就相当⼈性化了，语法也⾮常⾃然。这 其中就有深度学习参与其中。</li>
 </ol>
-<h4 id="3-3-常见引用类型"><a href="#3-3-常见引用类型" class="headerlink" title="3.3 常见引用类型"></a>3.3 常见引用类型</h4><p>java的引用类型一般分为四种：强引用、软引用、弱引用、虚引用   </p>
-<ul>
-<li>强引用：普通的变量引用，例如new 对象   </li>
-<li>软应用：GC时不会被主动回收，除非GC后的内存还是不够分配对象，那么此时就会回收软引用，软引用可用来实现内存敏感的高速缓存  </li>
-<li>弱引用：GC会直接回收  </li>
-<li>虚引用：几乎不用  </li>
-</ul>
-<h1 id="4-finalize-方法最终判定对象是否存活"><a href="#4-finalize-方法最终判定对象是否存活" class="headerlink" title="4. finalize()方法最终判定对象是否存活"></a>4. finalize()方法最终判定对象是否存活</h1><p>gc后无用的对象会被标记，然后进行筛选，如果对象没有覆盖ginalize方法，那么对象被直接回收，覆盖了finalize方法后，如果方法中对象被引用或者引用别的对象，那么就不会被回收</p>
-<h1 id="5-如何判断一个类是无用的类"><a href="#5-如何判断一个类是无用的类" class="headerlink" title="5. 如何判断一个类是无用的类"></a>5. 如何判断一个类是无用的类</h1><p>类需要同时满足下面3个条件才能算是 “无用的类” ：<br>无对象实力  classloder被回收  Class对象没有被以用</p>
-<ol>
-<li>该类所有的对象实例都已经被回收，也就是 Java 堆中不存在该类的任何实例。</li>
-<li>加载该类的 ClassLoader 已经被回收。</li>
-<li>该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">JVM指令：</span><br><span class="line">1.本地线程分配缓冲（Thread Local Allocation Buffer,TLAB默认开启）：­XX:+/­-UseTLAB，­XX:TLABSize 指定TLAB大小</span><br><span class="line">2.指针压缩(JDK1.6默认开启):-XX:+/-UseCompressedOops(默认开启)</span><br><span class="line">3.逃逸分析(JDK1.7默认开启)：-XX:+DoEscapeAnalysis</span><br><span class="line">4.标量替换(JDK1.7默认开启)：-XX:+EliminateAllocations</span><br><span class="line">5.Eden与Survivor区占比8:1:1自动变化(默认开启):-XX:+/-UseAdaptiveSizePolicy</span><br><span class="line">6.设置大对象大小(SerialGC)：-XX:PretenureSizeThreshold=1000000 (单位是字节)  -XX:+UseSerialGC  </span><br><span class="line">7.设置分代年龄最大值:(-XX:TargetSurvivorRatio)</span><br><span class="line">8.设置空间分配担保参数：-XX:-HandlePromotionFailure</span><br></pre></td></tr></table></figure>
+<h2 id="3-2-机器学习数据"><a href="#3-2-机器学习数据" class="headerlink" title="3.2 机器学习数据"></a>3.2 机器学习数据</h2><p>&emsp;&emsp;机器学习有三个关键词： 数据，模型，预测。机器学习强调从历史数据中⾃动学习，对数据之间的规律进⾏归<br>纳，形成模型，然后⽤模型来对实际问题进⾏预测。这个过程跟⼈类理解⼀个事物的过程是很类似的。回想⼀下，⼈类去分辨猫和狗、或者预测房价未来的⾛势，其实也是这样⼀个过程。⼈需要从⼤量的⽇常⽣活经验中归纳出⼀系列的规律，然后在⾯临具体问题时，就可以从众多规律中找到最优化的规律，来解决⽇常问题。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png" alt="机器学习数据结构"></p>
+<p>&emsp;&emsp;⽐如像这样⼀个房价数据，每⼀⾏数据称之为⼀个样本。多个样本就构成了⼀个数据集。⽽在每个样本当中，前⾯  部分房⼦的各个属性构成了特征值，代表样本的各个数据特征。⽽最后的⽬标值相当于是样本的结果。⽽机器学习的  过程就是要从已有的房价数据中学习到房价之间的规律，然后以后再来⼀个房⼦，我们就可以根据房⼦的这些属性，  预测他的房价是多少。⽽在数据集中，特征值是必不可少的，⼀般就是原始数据。⽽⽬标值有可能需要通过对数据进<br>⾏处理来获得，但是有些数据集是可以没有⽬标值的。</p>
+<h2 id="3-3-机器学习算法分类"><a href="#3-3-机器学习算法分类" class="headerlink" title="3.3 机器学习算法分类"></a>3.3 机器学习算法分类</h2><p>&emsp;&emsp;机器学习涉及到⾮常多的数学算法。对这些数学算法，进⾏简单分类。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB.png" alt="机器学习算法分类"><br>&emsp;&emsp;1.监督学习算法 (Supervised Algorithms）:在监督学习训练过程中，可以由训练数据集学到或建立一个模式（函数 / learning model），并依此模式推测新的实例。该算法要求特定的输入/输出，首先需要决定使用哪种数据作为范例。例如，文字识别应用中一个手写的字符，或一行手写文字。主要算法包括神经网络、支持向量机、最近邻居法、朴素贝叶斯法、决策树等。<br>&emsp;&emsp;2.无监督学习算法 (Unsupervised Algorithms):这类算法没有特定的目标输出，算法将数据集分为不同的组。(聚类)<br>&emsp;&emsp;3.强化学习算法 (Reinforcement Algorithms):强化学习普适性强，主要基于决策进行训练，算法根据输出结果（决策）的成功或错误来训练自己，通过大量经验训练优化后的算法将能够给出较好的预测。类似有机体在环境给予的奖励或惩罚的刺激下，逐步形成对刺激的预期，产生能获得最大利益的习惯性行为。在运筹学和控制论的语境下，强化学习被称作“近似动态规划”（approximate dynamic programming，ADP）。</p>
+<h2 id="3-4-怎么获取数据集？"><a href="#3-4-怎么获取数据集？" class="headerlink" title="3.4 怎么获取数据集？"></a>3.4 怎么获取数据集？</h2><p>&emsp;&emsp;在实际业务中，这些有⽤的数据集成本巨⼤，甚⾄可能包含了很多核⼼的商业机密。那在学习阶段，我们要怎么去  获得有价值的数据集呢？主要还是通过直接使⽤别⼈维护好的数据集。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">⾏业内有很多科研⼈员都维护了很多质量⾮常⾼的开源数据集。例如python的sklearn框架就集成了⼀部分常⽤的数据集。</span><br><span class="line"></span><br><span class="line">参⻅pycharm中的Demo: sklearn_datasets.py，加载sklearn本地的Iris鸢尾花数据集，还有也加载了</span><br><span class="line">Boston波斯顿房价数据集。这两个数据集是机器学习领域最为经典的数据集。Iris就是分类问题数据集， Boston则是回归问题数据集。</span><br><span class="line"></span><br><span class="line">⽽在java领域，可以使⽤Spark的mllib包来做机器学习。也可以将这些csv⽂件读到spark当中。参⻅SparkDemo中的</span><br><span class="line">LoadDataDemo。</span><br></pre></td></tr></table></figure>
+<p>UCI： <a target="_blank" rel="noopener" href="http://archive.ics.uci.edu/ml/">http://archive.ics.uci.edu/ml/</a>  这个⽹站上维护了很多经典的数据集。<br>kaggle： <a target="_blank" rel="noopener" href="https://www.kaggle.com/">https://www.kaggle.com/</a>  ⼀个综合性的机器学习竞赛平台。上⾯会开放很多数据集，开展很多机器学习的竞赛。有很多都是⼀些公司⾃⼰处理不了的实际数据，数据集的质量通常都是⽐较⾼的。同时也有很多别⼈分享  的基础教程以及算法分享，也都是⾮常不错的学习资料。</p>
+<p>&emsp;&emsp;关于机器学习，有⼀本⾮常经典的⼊⻔资料，就是周志华的《机器学习》，俗称为西⽠书。因封⾯有很多西⽠，并且全篇很     多问题都从西⽠谈起⽽得名。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E8%A5%BF%E7%93%9C%E4%B9%A6.png" alt="西瓜书"></p>
+<p>⽽关于深度学习，也有⼀本⾮常经典的资料，名字就叫做《Deep leaning》，深度学习。俗称为花书，因封⾯有⾮常多的花<br>⽽得名。<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E8%8A%B1%E4%B9%A6.jpg" alt="花书"></p>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%80%BB%E7%BB%93.png" alt="机器学习在推荐系统中的应用总结"></p>
 
       
 
@@ -267,7 +272,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">机器学习、推荐系统</a>
         		</li>
       		
 		</ul>
@@ -323,7 +328,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://aj-web.github.io/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://aj-web.github.io/2021/09/13/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -337,7 +342,7 @@
   
 <nav id="article-nav">
   
-    <a href="/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2021/09/13/%E7%89%B9%E5%BE%81%E5%B7%A5%E7%A8%8B%E5%9F%BA%E7%A1%80/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
@@ -347,8 +352,8 @@
     </a>
   
   
-    <a href="/2021/08/26/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90%E4%B8%8E%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">JVM内存模型深度剖析与优化</div>
+    <a href="/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">特征工程基础</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -375,7 +380,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E6%80%BB%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">1. 对象的创建总流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%A3%80%E6%9F%A5"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 类加载检查</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 分配内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%9B%B6%E5%80%BC"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 初始化零值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-%E8%AE%BE%E7%BD%AE%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 设置对象头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-%E6%89%A7%E8%A1%8Cinit%E6%96%B9%E6%B3%95"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5 执行init方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-6-%E4%BB%80%E4%B9%88%E6%98%AF%E6%8C%87%E9%92%88%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.0.0.6.</span> <span class="toc-text">1.6 什么是指针压缩</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-7-%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85%EF%BC%9A"><span class="toc-number">1.0.0.7.</span> <span class="toc-text">1.7 对齐填充：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="toc-number">2.</span> <span class="toc-text">2. 对象内存分配</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E5%B9%B4%E9%BE%84%E5%88%A4%E6%96%AD"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 对象动态年龄判断</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-%E8%80%81%E5%B9%B4%E4%BB%A3%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D%E6%8B%85%E4%BF%9D%E6%9C%BA%E5%88%B6"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 老年代空间分配担保机制</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6"><span class="toc-number">3.</span> <span class="toc-text">3. 对象内存回收</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="toc-number">3.0.0.1.</span> <span class="toc-text">3.1 引用计数法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E7%AE%97%E6%B3%95"><span class="toc-number">3.0.0.2.</span> <span class="toc-text">3.2 可达性算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-%E5%B8%B8%E8%A7%81%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.0.0.3.</span> <span class="toc-text">3.3 常见引用类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-finalize-%E6%96%B9%E6%B3%95%E6%9C%80%E7%BB%88%E5%88%A4%E5%AE%9A%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E5%AD%98%E6%B4%BB"><span class="toc-number">4.</span> <span class="toc-text">4. finalize()方法最终判定对象是否存活</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E7%B1%BB%E6%98%AF%E6%97%A0%E7%94%A8%E7%9A%84%E7%B1%BB"><span class="toc-number">5.</span> <span class="toc-text">5. 如何判断一个类是无用的类</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">1. 推荐系统功能介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 推荐系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E5%AE%9A%E4%B9%89"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 定义</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">2. 推荐系统实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%AE%80%E5%8D%95%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%80%9D%E8%B7%AF%EF%BC%9F"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 简单推荐系统思路？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%A0%B8%E5%BF%83%E7%90%86%E8%A7%A3"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 推荐系统核心理解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%95%88%E6%9E%9C%E8%AF%84%E4%BB%B7"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 推荐系统效果评价</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80"><span class="toc-number">3.</span> <span class="toc-text">3 推荐系统-机器学习基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E8%B5%B7%E6%BA%90%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 机器学习的起源：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%95%B0%E6%8D%AE"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 机器学习数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 机器学习算法分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E6%80%8E%E4%B9%88%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E9%9B%86%EF%BC%9F"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 怎么获取数据集？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">总结：</span></a></li></ol>
                     </div>
                 </span>
             </div>

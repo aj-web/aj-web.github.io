@@ -6,24 +6,28 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://aj-web.github.io">
-  <title>对象内存机制分配 | 呢喃的博客</title>
+  <title>特征工程基础 | 呢喃的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解">
+  <meta name="description" content="机器学习适用的数据为具有特征值(属性，label)和目标值(结果,point)的数据集。通过从历史数据集中学习经验，建立模型，从而达到预测新特征值对应的目标值的效果。因此在数据方面，越见多识广的数据集(样本集越大越全)，越能进行更可信的预测(越准确的预测)。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="对象内存机制分配">
-<meta property="og:url" content="https://aj-web.github.io/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/index.html">
+<meta property="og:title" content="特征工程基础">
+<meta property="og:url" content="https://aj-web.github.io/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/index.html">
 <meta property="og:site_name" content="呢喃的博客">
-<meta property="og:description" content="前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解">
+<meta property="og:description" content="机器学习适用的数据为具有特征值(属性，label)和目标值(结果,point)的数据集。通过从历史数据集中学习经验，建立模型，从而达到预测新特征值对应的目标值的效果。因此在数据方面，越见多识广的数据集(样本集越大越全)，越能进行更可信的预测(越准确的预测)。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/TLAB.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%A4%B4.png">
-<meta property="article:published_time" content="2021-08-26T01:54:41.570Z">
-<meta property="article:modified_time" content="2021-08-26T01:54:41.570Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127172752241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127172803822.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127172852955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127172949142.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127173019473.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127173046640.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191127173158282.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2021-09-13T10:38:30.031Z">
+<meta property="article:modified_time" content="2021-09-13T10:38:30.031Z">
 <meta property="article:author" content="ninan">
-<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="机器学习、特征工程、算法">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20191127172752241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70">
   
     <link rel="alternative" href="/atom.xml" title="呢喃的博客" type="application/atom+xml">
   
@@ -159,20 +163,20 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-JVM对象内存机制分配" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-机器学习典型算法实现" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      对象内存机制分配
+      特征工程基础
     </h1>
   
 
         
-        <a href="/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/" class="archive-article-date">
-  	<time datetime="2021-08-26T01:54:41.570Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-26</time>
+        <a href="/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" class="archive-article-date">
+  	<time datetime="2021-09-13T10:38:30.031Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-13</time>
 </a>
         
       </header>
@@ -181,59 +185,139 @@
       
         <hr>
 <blockquote>
-<p>前言：思考一个问题，对象是如何创建的，对象创建的过程是怎样的？ 详情请看对象内存机制分配详解    </p>
+<p>机器学习适用的数据为具有特征值(属性，label)和目标值(结果,point)的数据集。通过从历史数据集中学习经验，建立模型，从而达到预测新特征值对应的目标值的效果。因此在数据方面，越见多识广的数据集(样本集越大越全)，越能进行更可信的预测(越准确的预测)。</p>
 </blockquote>
 <span id="more"></span>
 
-<h1 id="1-对象的创建总流程"><a href="#1-对象的创建总流程" class="headerlink" title="1. 对象的创建总流程"></a>1. 对象的创建总流程</h1><p>直接上我整理的图，按照这个图的顺序来讲解对象创建的流程<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png" alt="对象创建"></p>
-<h4 id="1-1-类加载检查"><a href="#1-1-类加载检查" class="headerlink" title="1.1 类加载检查"></a>1.1 类加载检查</h4><p>虚拟机遇到一条new指令时，首先将去检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。<br>new指令对应到语言层面上讲是，new关键词、对象克隆、对象序列化等。</p>
-<h4 id="1-2-分配内存"><a href="#1-2-分配内存" class="headerlink" title="1.2 分配内存"></a>1.2 分配内存</h4><p>(1)指针碰撞”（Bump the Pointer）：如果内存规整那么指针左边存放已经分配的内存，右边存放未分配的内粗你，指针移动一段等于对象大小的距离<br>(2)空闲列表”（Free List）：如果内存不规整，就需要有一个列表记录哪些内存可用,为什么会出现空闲列表的情况，垃圾回收中的标记清除<br>(3)多线程中，多个对象分配内存，如何确保每个对象都成功分配内存：<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/TLAB.png" alt="TLAB"><br>3.1:CAS（compare and swap）虚拟机采用CAS配上失败重试的方式保证更新操作的原子性来对分配内存空间的动作进行同步处理。<br>3.2:本地线程分配缓冲（Thread Local Allocation Buffer,TLAB），把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存。通过­XX:+/­-UseTLAB参数来设定虚拟机是否使用TLAB(JVM会默认开启­XX:+UseTLAB)，­XX:TLABSize 指定TLAB大小，默认大小为Eden的1%  </p>
-<h4 id="1-3-初始化零值"><a href="#1-3-初始化零值" class="headerlink" title="1.3 初始化零值"></a>1.3 初始化零值</h4><p>内存分配完成后，虚拟机需要将分配到的内存空间都初始化为零值（不包括对象头）， 如果使用TLAB，这一工作过程也可以提前至TLAB分配时进行。这一步操作保证了对象的实例字段在Java代码中可以不赋初始值就直接使用，程序能访问到这些字段的数据类型    所对应的零值。</p>
-<h4 id="1-4-设置对象头"><a href="#1-4-设置对象头" class="headerlink" title="1.4 设置对象头"></a>1.4 设置对象头</h4><p>对象在内存中存储的布局可以分为3块区域：对象头（Header）、 实例数据（Instance Data）和对齐填充（Padding），对象头详细如下<br>Mark Word：不同状态的对线头不一样，一般有对象的hashcode(25位)，分代年龄(4位),是否偏向头，锁标志位<br>Klass Points：开启指针压缩时占4个字节，关闭指针压缩时占8个字节<br>数组长度：当对象为数组的时候才有<br><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/%E5%AF%B9%E8%B1%A1%E5%A4%B4.png" alt="对象头"></p>
-<h4 id="1-5-执行init方法"><a href="#1-5-执行init方法" class="headerlink" title="1.5 执行init方法"></a>1.5 执行init方法</h4><p>init方法是C++语言实现的，执行<init>方法，即对象按照程序员的意愿进行初始化。对应到语言层面上讲，<br>就是为属性赋值（注意，这与上面的赋零值不同，这是由程序员赋的值），和执行构造方法。   </p>
-<h4 id="1-6-什么是指针压缩"><a href="#1-6-什么是指针压缩" class="headerlink" title="1.6 什么是指针压缩"></a>1.6 什么是指针压缩</h4><p>java对象的指针压缩？<br>1.在64位平台的HotSpot中使用32位指针(实际存储用64位)，内存使用会多出1.5倍左右，使用较大指针在主内存和缓存之间移动数据，占用较大宽带，同时GC也会承受较大压力<br>2.为了减少64位平台下内存的消耗，启用指针压缩功能<br>3.在jvm中，32位地址最大支持4G内存(2的32次方)，可以通过对对象指针的存入堆内存时压缩编码、取出到cpu寄存器后解码方式进行优化(对象指针在堆中是32位，在寄存器中是35位，2的35次方=32G)，使得jvm只用32位地址就可以支持更大的内存配置(小于等于32G)<br>4.堆内存小于4G时，不需要启用指针压缩，jvm会直接去除高32位地址，即使用低虚拟地址空间<br>5.堆内存大于32G时，压缩指针会失效，会强制使用64位(即8字节)来对java对象寻址，这就会出现1的问题，所以堆内存不要大于32G为好</p>
-<h4 id="1-7-对齐填充："><a href="#1-7-对齐填充：" class="headerlink" title="1.7 对齐填充："></a>1.7 对齐填充：</h4><p>对于大部分处理器，对象以8字节整数倍来对齐填充都是最高效的存取方式</p>
-<h1 id="2-对象内存分配"><a href="#2-对象内存分配" class="headerlink" title="2. 对象内存分配"></a>2. 对象内存分配</h1><p>上面我们讲了对象分配的方式，接着我们来介绍下对象具体如何分配的   </p>
-<h4 id="2-1"><a href="#2-1" class="headerlink" title="2.1"></a>2.1</h4><ol>
-<li>new一个对象时，会通过逃逸分析先判断对象能否分配在栈上，JVM通过逃逸分析确定该对象不会被外部访问。如果不会逃逸可以将该对象在栈上分配内存，这样可以减轻垃圾回收的压力<br>在栈上创建对象的时候，还会通过标量替换，来优化  </li>
-</ol>
-<ul>
-<li>对象逃逸分析：就是分析对象动态作用域，当一个对象在方法中被定义后，它可能被外部方法所引用，例如作为调用参数传递到其他地方中。说白了就是判断这个对象是否只在一个方法中被使用</li>
-<li>标量替换：通过逃逸分析确定该对象不会被外部访问，并且对象可以被进一步分解时，JVM不会创建该对象，而是将该对象成员变量分解若干个被这个方法使用的成员变量所代替，这些代替的成员变量在栈帧或寄存器上分配空间，这样就不会因为没有一大块连续空间导致对象内存不够分配</li>
-<li>标量与聚合量：标量即不可被进一步分解的量，而JAVA的基本数据类型就是标量（如：int，long等基本数据类型以及reference类型等），标量的对立就是可以被进一步分解的量，而这种量称之为聚合量。而在JAVA中对象就是可以被进一步分解的聚合量。结论：栈上分配依赖于逃逸分析和标量替换   </li>
-</ul>
-<ol start="2">
-<li>能在栈上分配，则在栈上分配，否则在堆上进行分配   </li>
-<li>在堆上进行分配时：对象优先分配在Eden区,如果是大对象(字符串，数组)，大对象大小在这个参数只在 Serial 和ParNew两个收集器下可以设置，会直接放进老年代   </li>
-<li>不是大对象，会判断Eden区能否放下，不能的话，会执行minor GC，执行完还不能就会直接放入老年代   </li>
-<li>不是大对象则会采用TLAB在堆中预先分配内存，或者直接分配，多线程可能CAS分配 </li>
-</ol>
-<h4 id="2-2-对象动态年龄判断"><a href="#2-2-对象动态年龄判断" class="headerlink" title="2.2 对象动态年龄判断"></a>2.2 对象动态年龄判断</h4><p>对象动态年龄判断机制一般是在minor gc之后触发的。当前存放对象的Survivor区中，一批对象的总大小大于Survivor区域内存大小的50%(-XX:TargetSurvivorRatio可以指定年龄最大值)，那么此时大于等于这批对象年龄最大值的对象，就可以直接进入老年代了。这个规则其实是希望那些可能是长期存活的对象，尽早进入老年代。</p>
-<h4 id="2-3-老年代空间分配担保机制"><a href="#2-3-老年代空间分配担保机制" class="headerlink" title="2.3 老年代空间分配担保机制"></a>2.3 老年代空间分配担保机制</h4><p>年轻代每次minor GC之前都会判断如果老年代的可用空间小于年轻代里面所有对象的大小之和，就会看一个-XX:-HandlePromotionFailure”(jdk1.8默认就设置了)是否设置，如果有就会看历史minor GC之后进入老年代对象的平均大小是否小于老年代的可用内存，如果小于，代表执行minor GC即可，如果大于则执行full GC，没有设置参数则直接执行full GC，如果经过以上操作，对象不能全放进老年带，则OOM错误</p>
-<h1 id="3-对象内存回收"><a href="#3-对象内存回收" class="headerlink" title="3. 对象内存回收"></a>3. 对象内存回收</h1><h4 id="3-1-引用计数法"><a href="#3-1-引用计数法" class="headerlink" title="3.1 引用计数法"></a>3.1 引用计数法</h4><p>给对象中添加一个引用计数器，每当有一个地方引用它，计数器就加1；当引用失效，计数器就减1；任何时候计数器为0的对象就是不可能再被使用的。解决不了对象相互循环引用的问题</p>
-<h4 id="3-2-可达性算法"><a href="#3-2-可达性算法" class="headerlink" title="3.2 可达性算法"></a>3.2 可达性算法</h4><p>将“GC Roots” 对象作为起点，从这些节点开始向下搜索引用的对象，找到的对象都标记为非垃圾对象，其余未标记的对象都是垃圾对象，<br>GC Roots根节点：线程栈的本地变量、静态变量、本地方法栈的变量等等</p>
-<ol>
-<li>虚拟机栈（栈帧中的本地变量表）中引用的对象</li>
-<li>本地方法栈中JNI（即一般说的Native方法）引用的对象</li>
-<li>方法区中类静态属性引用的对象</li>
-<li>方法区中常量引用的对象</li>
-</ol>
-<h4 id="3-3-常见引用类型"><a href="#3-3-常见引用类型" class="headerlink" title="3.3 常见引用类型"></a>3.3 常见引用类型</h4><p>java的引用类型一般分为四种：强引用、软引用、弱引用、虚引用   </p>
-<ul>
-<li>强引用：普通的变量引用，例如new 对象   </li>
-<li>软应用：GC时不会被主动回收，除非GC后的内存还是不够分配对象，那么此时就会回收软引用，软引用可用来实现内存敏感的高速缓存  </li>
-<li>弱引用：GC会直接回收  </li>
-<li>虚引用：几乎不用  </li>
-</ul>
-<h1 id="4-finalize-方法最终判定对象是否存活"><a href="#4-finalize-方法最终判定对象是否存活" class="headerlink" title="4. finalize()方法最终判定对象是否存活"></a>4. finalize()方法最终判定对象是否存活</h1><p>gc后无用的对象会被标记，然后进行筛选，如果对象没有覆盖ginalize方法，那么对象被直接回收，覆盖了finalize方法后，如果方法中对象被引用或者引用别的对象，那么就不会被回收</p>
-<h1 id="5-如何判断一个类是无用的类"><a href="#5-如何判断一个类是无用的类" class="headerlink" title="5. 如何判断一个类是无用的类"></a>5. 如何判断一个类是无用的类</h1><p>类需要同时满足下面3个条件才能算是 “无用的类” ：<br>无对象实力  classloder被回收  Class对象没有被以用</p>
-<ol>
-<li>该类所有的对象实例都已经被回收，也就是 Java 堆中不存在该类的任何实例。</li>
-<li>加载该类的 ClassLoader 已经被回收。</li>
-<li>该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">JVM指令：</span><br><span class="line">1.本地线程分配缓冲（Thread Local Allocation Buffer,TLAB默认开启）：­XX:+/­-UseTLAB，­XX:TLABSize 指定TLAB大小</span><br><span class="line">2.指针压缩(JDK1.6默认开启):-XX:+/-UseCompressedOops(默认开启)</span><br><span class="line">3.逃逸分析(JDK1.7默认开启)：-XX:+DoEscapeAnalysis</span><br><span class="line">4.标量替换(JDK1.7默认开启)：-XX:+EliminateAllocations</span><br><span class="line">5.Eden与Survivor区占比8:1:1自动变化(默认开启):-XX:+/-UseAdaptiveSizePolicy</span><br><span class="line">6.设置大对象大小(SerialGC)：-XX:PretenureSizeThreshold=1000000 (单位是字节)  -XX:+UseSerialGC  </span><br><span class="line">7.设置分代年龄最大值:(-XX:TargetSurvivorRatio)</span><br><span class="line">8.设置空间分配担保参数：-XX:-HandlePromotionFailure</span><br></pre></td></tr></table></figure>
+<h1 id="1-KNN算法"><a href="#1-KNN算法" class="headerlink" title="1. KNN算法"></a>1. KNN算法</h1><p>1.<strong>定义：</strong><br>如果一个样本在特征空间中的K个最相似(距离最近)的样本中的大多数属于某一个类别，则该样本也属于这个类别。人以类聚，物以群分。  </p>
+<p>2.<strong>距离计算公式：</strong><br>&emsp;&emsp;欧式距离(平方根距离)、曼哈顿距离(绝对值距离)，明科夫斯基距离(以上两种距离均是明科夫斯基距离的特例)</p>
+<p>3.<strong>适用案例：</strong><br>&emsp;&emsp;iris，根据鸢尾花的一些特征判断一个鸢尾花所属的种类，适用于小数据场景，K-W数据量级别的样本</p>
+<p>4.<strong>算法优缺点：</strong><br>&emsp;&emsp;优点：简单、易于理解，易于实现，无需训练<br>&emsp;&emsp;缺点：1、懒惰算法，对预测样本分类时才进行计算，计算量大，内存开销大。 2、必须指定K值，K值选择会极大程度影响分类的准确度。 关于K值选取：K值过小，容易受到异常数据的影响。而K值过大，容易受样本不均衡的影响。</p>
+<p>5.<strong>特征工程处理：</strong><br>&emsp;&emsp;需尽量保证各个维度的数据公平性。无量纲化-标准化处理。尽量保证各个维度的数据公平性。</p>
+<p>6.<strong>skLearn API:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sklearn.neighbors.KNeighborsClassifier(n_neighbor=5,algrithm=&#x27;auto&#x27;)</span><br><span class="line">	n_neighbors: int 可选，默认5 ， K值</span><br><span class="line">	algorithm : &#123;&#x27;auto&#x27;,&#x27;ball_tree&#x27;,&#x27;kd_tree&#x27;,&#x27;brute&#x27;&#125; .可选。用于计算最近的算法。有ball_tree、kd_tree。不同的实现方式会影响效率，但不影响结果。一般用auto，会自己根据fit方法的值来选择合适的算法。</span><br></pre></td></tr></table></figure>
 
+<h1 id="2-朴素贝叶斯算法"><a href="#2-朴素贝叶斯算法" class="headerlink" title="2. 朴素贝叶斯算法"></a>2. 朴素贝叶斯算法</h1><p><strong>1.朴素：</strong><br>&emsp;&emsp;假定了特征与特征之间相互独立，没有影响。  </p>
+<p><strong>2.朴素的概率计算：</strong><br>&emsp;&emsp;30%的男人是好人，80%的老人是好人， 那男老人有24%的概率是好人。</p>
+<blockquote>
+<p>概率基础知识：独立的定义 P(A,B) = P(A)*P(B)</p>
+<p>全概率公式： P(A)=P(A|B1)*P(B1)+P(A|B2)*P(B2)+P(A|B3)*P(B3)+P(A|B4)*P(B4)+。。。。</p>
+</blockquote>
+<p><strong>3.应用场景：</strong><br>&emsp;&emsp;文本分类、评论区分好差评</p>
+<p><strong>4.优缺点：</strong><br>&emsp;&emsp;优点：发源于古典数学理论，有稳定的分类效率。对缺失数据不敏感，算法也比较简单，常用语文本分类。<br>&emsp;&emsp;分类速度快，准确度相对较高。<br>&emsp;&emsp;缺点：由于使用了样本属性独立的假设，当特征属性之间有关联时，其效果就不太好。<br>&emsp;&emsp;基于概率论的简单统计，样本数量越大越好。</p>
+<p><strong>5.Sklearn API:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sklearn.naive_bayes.MuitinomialNB(alpha = 1.0)</span><br><span class="line">alpha:拉普拉斯平滑系数，一般用1 。用来防止计算出的概率为0.使用方式是在分子和分母上一起添加平滑系数。</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-决策树"><a href="#3-决策树" class="headerlink" title="3. 决策树"></a>3. 决策树</h1><p>&emsp;&emsp;决策树是用来解决分类问题的。决策树模型就是一个多层的if-else结构。  </p>
+<p><strong>1.分类原理：</strong><br>&emsp;&emsp;决策树的关键就是判断的关键特征的先后顺序，要能尽量快速过滤掉大部分不符合标准的情况。<br>&emsp;&emsp;决策树的划分依据之一：信息熵 entropy，信息增益。信息熵可认为是信息的混乱程度。而信息增益可以理解为按某一个属性进行划分后的信息熵增益。决策树的划分方式就是在每一个节点选择信息增益最大的属性进行划分。<br>&emsp;&emsp;关于信息熵和信息增益的计算，在数学上有明确的计算公式，但是这里就不去过多推演了。</p>
+<p><strong>2.SkLearn API</strong>  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">决策树分类器</span><br><span class="line">criterion: 默认是&#x27;gini&#x27;系数，也可以选择信息增益的熵‘entropy’</span><br><span class="line">max_depth:树的深度大小</span><br><span class="line">random_state:随机数种子</span><br></pre></td></tr></table></figure>
+<p>熵的计算比较复杂，默认会使用相对比较简单的gini系数。gini系数可以理解为是信息熵的一个近似结果。</p>
+<p><strong>3.优缺点：</strong><br>&emsp;&emsp;优点：决策树模型的可解释能力强，不需要进行数据归一。模型就是一个多层的If-else结构，比较容易理解。<br>&emsp;&emsp;缺点：每个决策边界只能涉及到一个特征，不太容易扩展到更复杂的情况，整个决策树容易过大。树的深度过大就容易产生过拟合。<br>&emsp;&emsp;过拟合的调整方式是配置maxDepth参数，修改树的深度。改进方法是进行剪枝，防止整个树过于庞大。另一种比较好的方式就是采用随机森林</p>
+<h1 id="4-随机森林"><a href="#4-随机森林" class="headerlink" title="4. 随机森林"></a>4. 随机森林</h1><p>&emsp;&emsp;通过建立几个模型组合来解决单一预测问题。其原理就是生成多个分类器(模型)，各自独立地学习和做出预测。这样预测最后结合成组合预测，一般都优于任何一个单一分类器做出的预测。其输出的类别就是取多数的结果。</p>
+<p><strong>1.原理：</strong><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;BootStrap随机有放回抽样。从训练集中随机取一个样本，放入新训练集。然后从原训练集中再随机抽取(已抽取的样本放回原训练集)。这样，每棵树的训练集都是独有的。相当于将数据分散成不同的树。随机的预测思想就是这些树中有“正确”的树，也有“错误”的树。而“错误”的树的学习结果会互相抵消，最终“正确”的树就会脱颖而出。</p>
+<p><strong>2.sklearn API：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sklearn.ensemble.RandomForestClassifier(n_estimators=10,criterion=&#x27;gini&#x27;,max_depth=None,bootstrap=True,random_state=None,min_samples_split=2)</span><br><span class="line">n_estimators: Int 默认10 森林里的树木数量</span><br><span class="line">criteria： String  默认gini . 分隔特征的测量方法  entropy</span><br><span class="line">max_depth: Integer或者None,可选。树的最大深度</span><br><span class="line">max_features=&quot;auto&quot; 每个决策树的最大特征数量</span><br><span class="line">auto,  sqrt  log2   None</span><br><span class="line">auto和sqrt是一个意思，开根号。 None取跟原样本一样的特征树。</span><br><span class="line">bootstrap: boolean 默认true 是否在构建树时使用放回抽样</span><br><span class="line">min_samples_split:节点划分最少样本数</span><br><span class="line">min_samples_leaf:叶子节点的最小样本数</span><br></pre></td></tr></table></figure>
+<p><strong>3.超参数：</strong><br>n_estimator, max_depth,min_samples_split,min_samples_leaf。</p>
+<p><strong>4.优缺点：</strong><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;在所有分类算法中，具有较好的准确率。能够有效的运行在大数据集上，处理具有高维特征的输入样本，而且不需要降维。能够评估各个特征在分类问题上的重要性。</p>
+<h1 id="5-线性回归"><a href="#5-线性回归" class="headerlink" title="5. 线性回归"></a>5. 线性回归</h1><p>&emsp;&emsp;回归问题：目标值是一组连续的数据。找到一种函数关系，来表示特征值与目标值之间的关系。<br>&emsp;&emsp;而线性回归就是以一个多元一次函数的方式来尽量的逼近所有的目标点。<br>&emsp;&emsp;函数形式：y=f(x)=w_1<em>x_1+w_2</em>x_2+w_3<em>x_3+…..+b。 如果是二维y=w_1</em>x_1+b的话，大家应该非常熟悉，在坐标系上就是一条线，所以叫线性回归。<br>&emsp;&emsp;线性回归问题的关键就是要找出一组最适合的参数值w(形式为一个矩阵)和一个偏移量b。</p>
+<p><strong>1.原理：</strong><br>&emsp;&emsp;用一个多元一次方程来描述特征值与目标值之间的关系，线性关系。</p>
+<p>使用场景：波士顿房价预测Demo<br>目标：<br>模型参数能够尽量准确的预测目标值。–损失函数最小。</p>
+<p><strong>2.SKlearn API：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">--正规方程线性回归</span><br><span class="line">sklearn.linear_model.LinearRegression(fit_interfcept=True)</span><br><span class="line">- 通过正规方程优化</span><br><span class="line">- fit_intercept： 是否计算偏置--参数序列最后的b</span><br><span class="line">- LinearRegression.coef_ ： 回归系数</span><br><span class="line">- LinearRegression.intercept_ ： 偏置</span><br><span class="line"></span><br><span class="line">--随机梯度下降线性回归</span><br><span class="line">sklearn.linear_model.SGDRegressor(loss=&quot;squard_loss&quot;,fit_intercept=True,learning_rate=&#x27;invscaling&#x27;,eta0=0.01)</span><br><span class="line">- SGDRegressor类实现了随机梯度下降学习，支持不同的loss函数和正则化惩罚项来拟合线性回归模型</span><br><span class="line">- loss: 损失类型  squared_loss 普通最小二乘法</span><br><span class="line">- fit_intercept: 是否计算偏置</span><br><span class="line">- learning_rate: string,可选项：</span><br><span class="line">  constant : eta=eta0</span><br><span class="line">  optimal: eta=1.0/(alpha*(t+t0)) --default</span><br><span class="line">  invscaling.: eta = eta0/pow(t,power_t)</span><br><span class="line">  常用constant</span><br><span class="line">  返回结果</span><br><span class="line">  SGDRegressor.coef_ ：回归系数</span><br><span class="line">  SGDRegressor.intercept_ ：偏置</span><br><span class="line"></span><br><span class="line">--计算均方误差</span><br><span class="line">sklearn.metrics.mean_squared_error(y_true,y_predict)</span><br><span class="line">return  浮点数结果</span><br></pre></td></tr></table></figure>
+<p><strong>3.SparkDemo:</strong><br>&emsp;&emsp;JavaLinearSVCExample，计算正规方程。<br>JavaLinearRegressionWithElasticNetExample：包含了误差计算。这个ElasticNet就是线性回归用于优化损失函数的一种方式。</p>
+<p><strong>4.正规方程与线性回归</strong><br>&emsp;&emsp;在线性回归问题中，机器学习的目标就是不断减少损失函数。而优化损失函数的方法有两种：</p>
+<ul>
+<li>一种是像我们计算二元一次方程组一样，直接用公式去计算最佳的一组解。称为正规方程。这种方式不需要学习，直接求解。但是运算在大数据量下的计算会非常复杂，通常只适用于小数据量。<br>另一种是先假定一组解，然后不断试错，慢慢逼近正确答案。称之为梯度下降。<br>几种梯度下降的优化方法：</li>
+</ul>
+<p>&emsp;&emsp;(1)GD： Grandient Descent ; 原始的梯度下降方式。</p>
+<p>&emsp;&emsp;(2)SGD：Stochastic Grandient Descent：随机梯度下降。比较高效，节省时间。缺点是需要许多超参数，对特征标准化敏感。</p>
+<p>&emsp;&emsp;(3)SAG：Stochastic Average Gradient 。 随机平均梯度法。比SGD的收敛速度更快</p>
+<p><strong>5.spark示例：</strong><br>JavaSVMWithSGDExample<br>模型评估<br>&emsp;&emsp;计算损失函数的方法也是有很多的，比如均方误差RMSE，MSE，R2等。这些参数都可以用来对线性回归模型进行评测。</p>
+<p><strong>6.过拟合与欠拟合</strong><br>&emsp;&emsp;1.这也是机器学习过程中最为核心的问题。正规方程直接计算出最佳的结果，是不是就是最好的？其实也不是，数据之间的规律并不是稳定的，一般就不存在绝对的规律。机器学习的目的其实是要能够去对未来的数据进行预测，是一种模糊的行为。正规方程还有一个最重要的问题，就是他通常在训练集上表现良好，但是到验证集上表现就会差很多。这样的模型泛化能力不够，不能很好的体现未来数据的特征。这种问题就是过拟合现象，即机器学习从数据集中学到的规律过多。就像我们平常说的书呆子，学少了不好，学太多了同样也不好。<br>&emsp;&emsp;2.另外还有一种情况，如果数据的样本比较少，那机器学习学到的规律也会太不靠谱了。这就称为欠拟合现象。通常表现为算法在训练集和测试集上的表现都不太好。这就像我们常说的学渣，就是学习还不够。<br>&emsp;&emsp;3.过拟合和欠拟合现象是机器学习过程中绕不开的问题。而算法工程师很多的工作就是要综合评测算法和参数，在过拟合和欠拟合之间寻找最佳解。通常，对于欠拟合现象，可以通过加数据、加特征等手段来优化。而过拟合的优化就比较麻烦，通常需要做一些针对性的特征工程。</p>
+<h1 id="6-逻辑回归与二分类"><a href="#6-逻辑回归与二分类" class="headerlink" title="6. 逻辑回归与二分类"></a>6. 逻辑回归与二分类</h1><p>&emsp;&emsp;二分类问题： 是否垃圾邮件、是否金融诈骗、是否虚假帐号。。。 这里即是用逻辑回归来解决二分类问题。<br><strong>1.逻辑回归原理：</strong><br>&emsp;&emsp;先对一组数据建立线性回归模型，h(w) = w1<em>x1 + w2</em>x2+…+b 然后用线性回归的输出作为逻辑回归的输入，将特征值映射到一个分类中，作为预测的目标值。例如：sigmoid激活函数：</p>
+<p><img src="https://img-blog.csdnimg.cn/20191127172752241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70" alt="sigmoid"></p>
+<p>线性回归的输出作为逻辑回归的输入</p>
+<p><img src="https://img-blog.csdnimg.cn/20191127172803822.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70" alt="sigmoid2"></p>
+<p>例如，看下图的计算示例，逻辑回归的结果可以认为是样本的二分类概率。然后，同样通过损失函数来计算逻辑回归的模型性能。</p>
+<p><img src="https://img-blog.csdnimg.cn/20191127172852955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70" alt="逻辑回归"></p>
+<p><strong>2.逻辑回归API：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">	sklearn.linear_model.LogisticRegrsssion(solver=&#x27;liblinear&#x27;,penalty=&#x27;l2&#x27;,C=1.0)</span><br><span class="line">- solver: 优化求解模式。 默认 liblinear , 还有sag 随机平均梯度下降</span><br><span class="line">- penalty: 正则化的种类。 l1 l2</span><br><span class="line">- C: 正则化力度</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.SparkDemo:</strong><br>&emsp;&emsp;JavaLogisticRegressionWithLBFGSExample</p>
+<p><strong>4.逻辑回归模型评估：</strong><br>&emsp;&emsp;逻辑回归的结果只是一个二分类的概率，如有80%的可能是垃圾邮件。然而这种概率结果其实是很虚的，用模型评估拿到也是一个概率，闭上眼睛都选C也是一种概率。那要怎么评估模型的可信度呢？</p>
+<p><strong>5.混淆矩阵、精确率(Precision)、召回率(Recall)</strong><br>&emsp;&emsp;在二分类任务中，预测结果与正确标记之间存在四种不同的组合，构成混淆矩阵(这个矩阵其实在多分类问题中也能建立，只是更加复杂)，通过混淆矩阵，可以对分类结果从多个不同的方面来进行评价。</p>
+<table>
+<thead>
+<tr>
+<th align="left">真实结果\预测结果</th>
+<th>正例</th>
+<th>假例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">正例</td>
+<td>真正例TP</td>
+<td>为反例FN</td>
+</tr>
+<tr>
+<td align="left">假例</td>
+<td>伪正例FP</td>
+<td>真反例TN</td>
+</tr>
+</tbody></table>
+<p><strong>6.精确率Precision</strong>： 预测结果为正例样本中真实为正例的比例：</p>
+<pre><code>  一批西瓜中，预测为好西瓜的瓜有多少真正是好西瓜。体现模型的准确性。--要把好西瓜挑出来
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/20191127172949142.png" alt="精确率"></p>
+<p><strong>7.召回率Recall</strong>：真实为正例的样本中预测结果也为正例的比例：对正样本的区分能力。</p>
+<pre><code>  一批西瓜中，所有真正为好西瓜的西瓜中有多少是被正确预测为好西瓜。体现模型对正样本的区分能力。--要把坏西瓜扔掉
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/20191127173019473.png" alt="召回率"></p>
+<p>另外，还有其他更复杂的评估标准。如F1-Score，反映了模型的稳健型</p>
+<p><img src="https://img-blog.csdnimg.cn/20191127173046640.png" alt="F1Score"></p>
+<p><strong>8.混淆矩阵计算API：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">`sklearn.metrics.classification_report(y_true,y_pred,labels=[],target_name=None)`</span><br><span class="line">- `y_true : 真实目标值数组`</span><br><span class="line">- `y_pred: 估计器预测目标值`</span><br><span class="line">- `labels: 指定类别对应的数字`</span><br><span class="line">- `target_names: 目标类别名称`</span><br><span class="line">- `return： 每个类别精确率与召回率`</span><br><span class="line">  - `precision 精确率`</span><br><span class="line">  - `recall 召回率`</span><br><span class="line">  - `f1-scoreL 稳健度`</span><br><span class="line">  - `support 样本数`</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;有了这些指标后，能够一定程度上评估模型的健康度。但是光有这些指标还不太够，例如在样本不均衡，正样本太多，负样本太少时，这些指标评估结果就不太可信。而为了能更准确的评估二分类模型，就引入了ROC曲线和AOC指标。</p>
+<p><strong>9.ROC曲线和AUC指标</strong></p>
+<p>首先需要了解TPRate和FPRate</p>
+<ul>
+<li><p>TPRate = TP / (TP+FN): 所有真实类别为1的样本中，预测类别也为1的比例</p>
+</li>
+<li><p>FPRate = FP/( FP + TN):所有真实类别为0的样本中，预测类别为1的比例</p>
+<p>有这两个数据后，对于每一个分类器，就可以建立一条ROC曲线<br><img src="https://img-blog.csdnimg.cn/20191127173158282.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3JveWtpbmd3,size_16,color_FFFFFF,t_70" alt="ROC曲线"></p>
+<p>而AUC指标就可以认为是ROC曲线下方的图形面积。</p>
+<p>因此，</p>
+</li>
+<li><p>AUC指标的概率意义是随机取一对正负样本，正样本得分大于负样本的概率。</p>
+</li>
+<li><p>AUC指标的最小值是0.5，最大值是1，取值越大越好</p>
+</li>
+<li><p>AUC=1，就是完美分类器，采用这个预测模型时，不管设定什么阈值都能的出完美预测结果。但是，在绝大多数预测的场合，都不存在完美分类器。</p>
+</li>
+<li><p>0.5&lt;AUC&lt;1,优于随机猜测。这个分类器(模型)妥善设定阈值的话，能有预测价值。</p>
+</li>
+<li><p>如果AUC&lt;0.5，就会采用1-AUC来表示AUC的值，代表反向预测。</p>
+</li>
+<li><p>同时，AUC指标也能用于比较多个不同的分类器的性能。</p>
+</li>
+</ul>
+<p><strong>10.AUC指标计算API：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">	`sklearn.metrics.roc_auc_score(y_true,y_score)`</span><br><span class="line">- `计算ROC曲线面积，即AUC值`</span><br><span class="line">- `y_true: 每个样本的真是类别，必须为0-反例，1-正例 标记`</span><br><span class="line">- `y_score:预测得分，可以是正类的估计概率、可信值或者分类器方法的返回值`</span><br></pre></td></tr></table></figure>
+
+<p><strong>11.Spark计算AUC示例：</strong></p>
+<p>见JavaLBFGSExample中一段示例代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// Get evaluation metrics.</span><br><span class="line">    BinaryClassificationMetrics metrics =</span><br><span class="line">      new BinaryClassificationMetrics(scoreAndLabels.rdd());</span><br><span class="line">    double auROC = metrics.areaUnderROC();</span><br></pre></td></tr></table></figure>
+
+<p><strong>12.AUC总结</strong></p>
+<ul>
+<li><p>AUC只能用来评估二分类问题</p>
+</li>
+<li><p>AUC非常适合评价样本不均衡时的分类器性能。</p>
+</li>
+</ul>
+<h1 id="7-无监督学习-K-means算法"><a href="#7-无监督学习-K-means算法" class="headerlink" title="7. 无监督学习-K-means算法"></a>7. 无监督学习-K-means算法</h1>
       
 
       
@@ -267,7 +351,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">机器学习、特征工程、算法</a>
         		</li>
       		
 		</ul>
@@ -323,7 +407,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://aj-web.github.io/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://aj-web.github.io/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -337,18 +421,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2021/09/13/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%B8%E5%9E%8B%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2021/09/13/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          特征工程基础
+          推荐系统理论基础
         
       </div>
     </a>
   
   
-    <a href="/2021/08/26/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90%E4%B8%8E%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">JVM内存模型深度剖析与优化</div>
+    <a href="/2021/08/26/JVM%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E6%9C%BA%E5%88%B6%E5%88%86%E9%85%8D/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">对象内存机制分配</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -375,7 +459,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E6%80%BB%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">1. 对象的创建总流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%A3%80%E6%9F%A5"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 类加载检查</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 分配内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%9B%B6%E5%80%BC"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 初始化零值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-%E8%AE%BE%E7%BD%AE%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 设置对象头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-%E6%89%A7%E8%A1%8Cinit%E6%96%B9%E6%B3%95"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5 执行init方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-6-%E4%BB%80%E4%B9%88%E6%98%AF%E6%8C%87%E9%92%88%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.0.0.6.</span> <span class="toc-text">1.6 什么是指针压缩</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-7-%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85%EF%BC%9A"><span class="toc-number">1.0.0.7.</span> <span class="toc-text">1.7 对齐填充：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="toc-number">2.</span> <span class="toc-text">2. 对象内存分配</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E5%B9%B4%E9%BE%84%E5%88%A4%E6%96%AD"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 对象动态年龄判断</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-%E8%80%81%E5%B9%B4%E4%BB%A3%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D%E6%8B%85%E4%BF%9D%E6%9C%BA%E5%88%B6"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 老年代空间分配担保机制</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6"><span class="toc-number">3.</span> <span class="toc-text">3. 对象内存回收</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="toc-number">3.0.0.1.</span> <span class="toc-text">3.1 引用计数法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E7%AE%97%E6%B3%95"><span class="toc-number">3.0.0.2.</span> <span class="toc-text">3.2 可达性算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-%E5%B8%B8%E8%A7%81%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.0.0.3.</span> <span class="toc-text">3.3 常见引用类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-finalize-%E6%96%B9%E6%B3%95%E6%9C%80%E7%BB%88%E5%88%A4%E5%AE%9A%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E5%AD%98%E6%B4%BB"><span class="toc-number">4.</span> <span class="toc-text">4. finalize()方法最终判定对象是否存活</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E7%B1%BB%E6%98%AF%E6%97%A0%E7%94%A8%E7%9A%84%E7%B1%BB"><span class="toc-number">5.</span> <span class="toc-text">5. 如何判断一个类是无用的类</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-KNN%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">1. KNN算法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2. 朴素贝叶斯算法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%86%B3%E7%AD%96%E6%A0%91"><span class="toc-number">3.</span> <span class="toc-text">3. 决策树</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97"><span class="toc-number">4.</span> <span class="toc-text">4. 随机森林</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="toc-number">5.</span> <span class="toc-text">5. 线性回归</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB"><span class="toc-number">6.</span> <span class="toc-text">6. 逻辑回归与二分类</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E6%97%A0%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0-K-means%E7%AE%97%E6%B3%95"><span class="toc-number">7.</span> <span class="toc-text">7. 无监督学习-K-means算法</span></a></li></ol>
                     </div>
                 </span>
             </div>
