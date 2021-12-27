@@ -6,7 +6,7 @@
   <link href="https://aj-web.github.io/atom.xml" rel="self"/>
   
   <link href="https://aj-web.github.io/"/>
-  <updated>2021-11-29T08:33:34.184Z</updated>
+  <updated>2021-12-27T08:44:56.995Z</updated>
   <id>https://aj-web.github.io/</id>
   
   <author>
@@ -17,23 +17,24 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
+    <title>JVM-5：JVM底层学习</title>
     <link href="https://aj-web.github.io/2021/11/27/%E6%89%8B%E5%86%99JVM%E7%AC%94%E8%AE%B0/"/>
     <id>https://aj-web.github.io/2021/11/27/%E6%89%8B%E5%86%99JVM%E7%AC%94%E8%AE%B0/</id>
     <published>2021-11-27T09:30:27.882Z</published>
-    <updated>2021-11-29T08:33:34.184Z</updated>
+    <updated>2021-12-27T08:44:56.995Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="Linux多线程机制："><a href="#Linux多线程机制：" class="headerlink" title="Linux多线程机制："></a>Linux多线程机制：</h2><ul><li><p>Linux创建线程：<code>pthread_create</code>  </p></li><li><p>等待子线程运行结束： <code>pthread_join</code></p></li><li><p>线程属性：<code>pthread_attr_int</code>,<code>pthread_attr_destory</code></p></li><li><p>线程栈大小：默认1M，可以修改</p></li><li><p>运行机制有两种：1.join机制   2.Detach机制：线程执行完了会自动释放资源（java中的线程运行机制就是Detach机制），又称分离线程</p></li><li><p>使用join机制时获取线程结果有两种，一种是通过<code>pthread_join</code>接收线程的执行结果，或者是在子线程中通过<code>pthread_exit</code>来退出子线程同时返回一个结果，但是由于JVM的线程是Detach机制创建的，所以并不能用上面两种方案实现</p></li><li><p>如果在Linux中创建线程使用Detach机制，那么<code>pthread_join</code>是无效的，早期Linux版本会报错。那么这个时候如何获取线程的执行结果呢？答案就是通过修改共享内存上变量的值</p><p>我们都知道Java创建的线程其实是调用的操作系统的能力，那么从java中的线程对象到OS的线程对象，依次经过以下对应关系，而Linux线程操作的结果，就会存储在JVM的Java Thread对象中的_VM_result_2中，这个对象就可以理解为共享内存</p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271645498.png"></p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271641514.png" alt="线程对象"></p><h1 id="关于STW"><a href="#关于STW" class="headerlink" title="关于STW"></a>关于STW</h1><ol><li><p>GC的时候会触发STW，暂停所有用户的线程，但是暂停用户线程的前提是用户到达了安全点</p></li><li><p>常见的安全点有： 1.方法返回之前  2.调用某个方法之后  3.抛出异常的位置  4.循环的末尾</p></li></ol><p><strong>GC时间=垃圾回收的时间+线程到达安全点的时间</strong></p><p>那么安全点到底是什么？这个得去JVM的源码中看下，其实安全点的本质就是一个4字节的可读可写可执行的内存区域，其实是1字节，但是为了对齐就申请了4字节，当正常执行时，线程运行到某个特殊方法对安全点进行操作，此时不会抛出异常，<em><strong>其实本质没有进行啥操作但是重要的是没有抛出信号（异常）</strong></em>，但是如果GC需要阻塞线程的时候，JVM会把安全点修改成为不可读不可写不可执行，这样当线程运行到操作安全点的方法时就会触发异常。抛出信号SIGSEGV，JVM中会提前注册了这个信号，所以抛出信号后会进行宿舍，执行阻塞的操作是CAS实现的。</p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271724397.png"></p><p>happens-befor——先行发生原则</p></li></ul>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;Linux多线程机制：&quot;&gt;&lt;a href=&quot;#Linux多线程机制：&quot; class=&quot;headerlink&quot; title=&quot;Linux多线程机制：&quot;&gt;&lt;/a&gt;Linux多线程机制：&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Linux创建线程：&lt;code&gt;pthread_c</summary>
-      
+    <content type="html"><![CDATA[<hr><blockquote><p>前言：Java创建线程的能力，实际上是通过调用操作系统的能力实现的</p></blockquote><span id="more"></span><h2 id="Linux多线程机制："><a href="#Linux多线程机制：" class="headerlink" title="Linux多线程机制："></a>Linux多线程机制：</h2><ul><li><p>Linux创建线程：<code>pthread_create</code>  </p></li><li><p>等待子线程运行结束： <code>pthread_join</code></p></li><li><p>线程属性：<code>pthread_attr_int</code>,<code>pthread_attr_destory</code></p></li><li><p>线程栈大小：默认1M，可以修改</p></li><li><p>运行机制有两种：1.join机制   2.Detach机制：线程执行完了会自动释放资源（java中的线程运行机制就是Detach机制），又称分离线程</p></li><li><p>使用join机制时获取线程结果有两种，一种是通过<code>pthread_join</code>接收线程的执行结果，或者是在子线程中通过<code>pthread_exit</code>来退出子线程同时返回一个结果，但是由于JVM的线程是Detach机制创建的，所以并不能用上面两种方案实现</p></li><li><p>如果在Linux中创建线程使用Detach机制，那么<code>pthread_join</code>是无效的，早期Linux版本会报错。那么这个时候如何获取线程的执行结果呢？答案就是通过修改共享内存上变量的值</p><p>我们都知道Java创建的线程其实是调用的操作系统的能力，那么从java中的线程对象到OS的线程对象，依次经过以下对应关系，而Linux线程操作的结果，就会存储在JVM的Java Thread对象中的_VM_result_2中，这个对象就可以理解为共享内存</p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271645498.png"></p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271641514.png" alt="线程对象"></p><h1 id="关于STW"><a href="#关于STW" class="headerlink" title="关于STW"></a>关于STW</h1><ol><li><p>GC的时候会触发STW，暂停所有用户的线程，但是暂停用户线程的前提是用户到达了安全点</p></li><li><p>常见的安全点有： 1.方法返回之前  2.调用某个方法之后  3.抛出异常的位置  4.循环的末尾</p></li></ol><p><strong>GC时间=垃圾回收的时间+线程到达安全点的时间</strong></p><p>那么安全点到底是什么？这个得去JVM的源码中看下，其实安全点的本质就是一个4字节的可读可写可执行的内存区域，其实是1字节，但是为了对齐就申请了4字节，当正常执行时，线程运行到某个特殊方法对安全点进行操作，此时不会抛出异常，<em><strong>其实本质没有进行啥操作但是重要的是没有抛出信号（异常）</strong></em>，但是如果GC需要阻塞线程的时候，JVM会把安全点修改成为不可读不可写不可执行，这样当线程运行到操作安全点的方法时就会触发异常。抛出信号SIGSEGV，JVM中会提前注册了这个信号，所以抛出信号后会进行宿舍，执行阻塞的操作是CAS实现的。</p><p><img src="https://raw.githubusercontent.com/aj-web/picturebed/master/202111271724397.png"></p><p>happens-befor——先行发生原则</p></li></ul>]]></content>
     
     
+    <summary type="html">&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;前言：Java创建线程的能力，实际上是通过调用操作系统的能力实现的&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
     
+    
+    
+    
+    <category term="JVM" scheme="https://aj-web.github.io/tags/JVM/"/>
     
   </entry>
   
