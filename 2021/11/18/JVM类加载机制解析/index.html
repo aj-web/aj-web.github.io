@@ -24,13 +24,13 @@
 
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="https://aj-web.github.io">
+  <link rel="dns-prefetch" href="https://www.ninan.life">
   <title>JVM-2：类加载机制解析 | 呢喃的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1.1类加载机制 类加载步骤：加载 &gt; &gt; 验证 &gt; &gt; 准备 &gt; &gt; 解析 &gt; &gt; 初始化 &gt; &gt; 使用 &gt; &gt; 卸载">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM-2：类加载机制解析">
-<meta property="og:url" content="https://aj-web.github.io/2021/11/18/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:url" content="https://www.ninan.life/2021/11/18/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%A7%A3%E6%9E%90/index.html">
 <meta property="og:site_name" content="呢喃的博客">
 <meta property="og:description" content="1.1类加载机制 类加载步骤：加载 &gt; &gt; 验证 &gt; &gt; 准备 &gt; &gt; 解析 &gt; &gt; 初始化 &gt; &gt; 使用 &gt; &gt; 卸载">
 <meta property="og:locale" content="zh_CN">
@@ -356,7 +356,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://aj-web.github.io/2021/11/18/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%A7%A3%E6%9E%90/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://www.ninan.life/2021/11/18/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%A7%A3%E6%9E%90/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -419,6 +419,32 @@
 
 
 
+  
+      <section id="comments" class="comments">
+        <style>
+          .comments{margin:30px;padding:10px;background:#fff}
+          @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+        </style>
+        <div id="vcomment" class="comment"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+   var notify = 'false' == true ? true : false;
+   var verify = 'false' == true ? true : false;
+    window.onload = function() {
+        new Valine({
+            el: '.comment',
+            notify: notify,
+            verify: verify,
+            app_id: "jTRJGsmA4xfv6pp86CDq4vvb-gzGzoHsz",
+            app_key: "7abRlemxRDUmMXpcdLw8XSka",
+            placeholder: "Just go go",
+            avatar:""
+        });
+    }
+</script>
+
+    </section>
   
 
   
